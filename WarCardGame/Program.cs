@@ -29,7 +29,7 @@ internal class Solution
             Console.Error.Write(cardp1 + " ");
             p1q.Enqueue(cardp1);
         }
-        Console.WriteLine();
+        Console.Error.WriteLine();
         int m = int.Parse(Console.ReadLine()); // the number of cards for player 2
         Console.Error.Write(m + " ");
         for (int i = 0; i < m; i++)
@@ -38,7 +38,7 @@ internal class Solution
             Console.Error.Write(cardp2 + " ");
             p2q.Enqueue(cardp2);
         }
-        Console.WriteLine();
+        Console.Error.WriteLine();
 
         while (true)
         {
@@ -46,10 +46,10 @@ internal class Solution
             index++;
             Console.Error.WriteLine("Round " + index);
 
-            Console.Write(p1q.Count + " ");
+            Console.Error.Write(p1q.Count + " ");
             PrintValues(p1q);
 
-            Console.Write(p2q.Count + " ");
+            Console.Error.Write(p2q.Count + " ");
             PrintValues(p2q);
 
             Round(p1q.Dequeue() as string, p2q.Dequeue() as string);
@@ -177,7 +177,7 @@ internal class Solution
     public static void PrintValues(IEnumerable myCollection)
     {
         foreach (Object obj in myCollection)
-            Console.Write("{0} ", obj);
-        Console.WriteLine();
+            Console.Error.Write("{0} ", obj);
+        Console.Error.WriteLine();
     }
 }
