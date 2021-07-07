@@ -139,17 +139,18 @@ internal class Solution
         {
             // player 1 wins
             Log("Player 1 wins WAR in Round " + index);
+            p1q.Enqueue(playCard1);
             p1q.Enqueue(p1warQ.Dequeue());
             p1q.Enqueue(p1warQ.Dequeue());
             p1q.Enqueue(p1warQ.Dequeue());
             p1q.Enqueue(cardp1);
-            p1q.Enqueue(playCard1);
 
+            p1q.Enqueue(playCard2);
             p1q.Enqueue(p2warQ.Dequeue());
             p1q.Enqueue(p2warQ.Dequeue());
             p1q.Enqueue(p2warQ.Dequeue());
             p1q.Enqueue(cardp2);
-            p1q.Enqueue(playCard2);
+
             return RoundResult.Player1Wins;
         }
         else if (CardValue(cardp2) > CardValue(cardp1))
@@ -157,17 +158,18 @@ internal class Solution
             // player 2 wins
             Log("Player 2 wins WAR in Round " + index);
 
+            p2q.Enqueue(playCard1);
             p2q.Enqueue(p1warQ.Dequeue());
             p2q.Enqueue(p1warQ.Dequeue());
             p2q.Enqueue(p1warQ.Dequeue());
             p2q.Enqueue(cardp1);
-            p2q.Enqueue(playCard1);
 
+            p2q.Enqueue(playCard2);
             p2q.Enqueue(p2warQ.Dequeue());
             p2q.Enqueue(p2warQ.Dequeue());
             p2q.Enqueue(p2warQ.Dequeue());
             p2q.Enqueue(cardp2);
-            p2q.Enqueue(playCard2);
+
             return RoundResult.Player2Wins;
         }
         else if (CardValue(cardp1) == CardValue(cardp2))
