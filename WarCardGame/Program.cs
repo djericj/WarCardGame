@@ -12,12 +12,18 @@ using System.Collections.Generic;
 
 internal class Solution
 {
-    private static Queue p1q = new Queue();
-    private static Queue p2q = new Queue();
-
+    private static readonly Queue p1q = new Queue();
+    private static readonly Queue p2q = new Queue();
     private static int index = 0;
 
-    private static bool end = false;
+    private enum RoundResult
+    {
+        Unknown,
+        Player1Wins,
+        Player2Wins,
+        War,
+        GameOver
+    }
 
     private static void Main(string[] args)
     {
@@ -42,6 +48,8 @@ internal class Solution
 
         while (true)
         {
+            // safety off
+            //if (index == 53) break;
             //rounds
             index++;
             Console.Error.WriteLine("Round " + index);
@@ -52,7 +60,18 @@ internal class Solution
             Console.Error.Write(p2q.Count + " ");
             PrintValues(p2q);
 
-            Round(p1q.Dequeue() as string, p2q.Dequeue() as string);
+            var roundResult = Round(p1q.Dequeue() as string, p2q.Dequeue() as string);
+            if (roundResult == RoundResult.War)
+            {
+                // WAR
+                roundResult = War();
+            }
+            if (roundResult == RoundResult.GameOver)
+            {
+                Console.WriteLine("PAT");
+                break;
+            }
+
             if (p1q.Count == 0)
             {
                 Console.WriteLine("2 " + index);
@@ -64,11 +83,9 @@ internal class Solution
                 break;
             }
         }
-
-        //        Console.WriteLine("PAT");
     }
 
-    private static void Round(string cardp1, string cardp2)
+    private static RoundResult Round(string cardp1, string cardp2)
     {
         if (CardValue(cardp1) > CardValue(cardp2))
         {
@@ -76,6 +93,7 @@ internal class Solution
             Console.Error.WriteLine("Player 1 wins Round " + index);
             p1q.Enqueue(cardp1);
             p1q.Enqueue(cardp2);
+            return RoundResult.Player1Wins;
         }
         else if (CardValue(cardp2) > CardValue(cardp1))
         {
@@ -83,14 +101,11 @@ internal class Solution
             Console.Error.WriteLine("Player 2 wins Round " + index);
             p2q.Enqueue(cardp1);
             p2q.Enqueue(cardp2);
+            return RoundResult.Player2Wins;
         }
         else if (CardValue(cardp1) == CardValue(cardp2))
         {
-            Console.Error.WriteLine("WAR in Round " + index);
-            var p1warQ = CreateWarQueue(p1q);
-            var p2warQ = CreateWarQueue(p2q);
-            // WAR
-            if (p1q.Count > 0 && p2q.Count > 0) War(p1warQ, p2warQ, p1q.Dequeue() as string, p2q.Dequeue() as string);
+            return RoundResult.War;
         }
         else
         {
@@ -98,52 +113,61 @@ internal class Solution
         }
     }
 
-    private static void War(Queue p1WarQ, Queue p2WarQ, string cardp1, string cardp2)
+    private static RoundResult War()
     {
+        Console.Error.WriteLine("WAR in Round " + index);
+        if (p1q.Count < 4)
+        {
+            return RoundResult.GameOver;
+        }
+        var p1warQ = CreateWarQueue(p1q);
+        var cardp1 = p1q.Dequeue().ToString();
+        PrintValues(p1warQ);
+        Console.Error.WriteLine(cardp1);
+
+        if (p2q.Count < 4)
+        {
+            return RoundResult.GameOver;
+        }
+        var p2warQ = CreateWarQueue(p2q);
+        var cardp2 = p2q.Dequeue().ToString();
+        PrintValues(p2warQ);
+        Console.Error.WriteLine(cardp2);
         // assume 4 cards, 3 face down then 1 turned over.
         if (CardValue(cardp1) > CardValue(cardp2))
         {
             // player 1 wins
             Console.Error.WriteLine("Player 1 wins WAR in Round " + index);
-            p1q.Enqueue(p1q.Dequeue());
-            p1q.Enqueue(p1q.Dequeue());
-            p1q.Enqueue(p1q.Dequeue());
+            p1q.Enqueue(p1warQ.Dequeue());
+            p1q.Enqueue(p1warQ.Dequeue());
+            p1q.Enqueue(p1warQ.Dequeue());
             p1q.Enqueue(cardp1);
 
-            p1q.Enqueue(p2WarQ.Dequeue());
-            p1q.Enqueue(p2WarQ.Dequeue());
-            p1q.Enqueue(p2WarQ.Dequeue());
+            p1q.Enqueue(p2warQ.Dequeue());
+            p1q.Enqueue(p2warQ.Dequeue());
+            p1q.Enqueue(p2warQ.Dequeue());
             p1q.Enqueue(cardp2);
+            return RoundResult.Player1Wins;
         }
         else if (CardValue(cardp2) > CardValue(cardp1))
         {
             // player 2 wins
             Console.Error.WriteLine("Player 2 wins WAR in Round " + index);
-            p2q.Enqueue(p2q.Dequeue());
-            p2q.Enqueue(p2q.Dequeue());
-            p2q.Enqueue(p2q.Dequeue());
+            p2q.Enqueue(p2warQ.Dequeue());
+            p2q.Enqueue(p2warQ.Dequeue());
+            p2q.Enqueue(p2warQ.Dequeue());
             p2q.Enqueue(cardp2);
 
-            p2q.Enqueue(p1WarQ.Dequeue());
-            p2q.Enqueue(p1WarQ.Dequeue());
-            p2q.Enqueue(p1WarQ.Dequeue());
+            p2q.Enqueue(p1warQ.Dequeue());
+            p2q.Enqueue(p1warQ.Dequeue());
+            p2q.Enqueue(p1warQ.Dequeue());
             p2q.Enqueue(cardp1);
+            return RoundResult.Player2Wins;
         }
         else if (CardValue(cardp1) == CardValue(cardp2))
         {
-            if (p1q.Count == 0 || p2q.Count == 2)
-            {
-                Console.WriteLine("PAT");
-            }
-            else
-            {
-                Console.Error.WriteLine("WAR again in Round " + index);
-                var p1warQ = CreateWarQueue(p1q);
-                var p2warQ = CreateWarQueue(p2q);
-
-                // WAR
-                War(p1warQ, p2WarQ, p1q.Dequeue() as string, p2q.Dequeue() as string);
-            }
+            // WAR
+            return War();
         }
         else
         {
